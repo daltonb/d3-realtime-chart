@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Hello World!</title>
+<style>
+
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+</style>
+</head>
+<body>
+  <h1>Real-time plotting test</h1>
+  <div id="trackingTask"></div>
+  <script>
+    const ipcRenderer = require('electron').ipcRenderer;
+    const d3 = require('d3');
+
+    var pathDim = 250;
+
+    var pathData = new Array(pathDim).fill(0);
+
+    var margin = {top: 30, bottom: 30, left: 50, right: 50},
+        height = 500 - margin.top - margin.bottom,
+        width = 1000 - margin.left - margin.right;
+
+    var xDomain = [0, pathDim],
+        yDomain = [-500, 500];
+
+    var x = d3.scale.linear()
+        .domain(xDomain)
+        .range([0, width]);
+
+    var y = d3.scale.linear()
+        .domain(yDomain)
+        .range([height, 0]);
+
+    var line = d3.svg.line()
+        .x(function (d, i) { return x(i); })
+        .y(function (d, i) { return y(d); });
+
+    var taskDisplay = d3.select("#trackingTask").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .style("margin-left", -margin.left + "px");
+
+    var path = taskDisplay.append("path")
+        .datum(pathData)
+        .attr("d", line);
+
+    ipcRenderer.on('ready-to-draw', function(event, msg) {
+        console.log('page loaded!');
+        path.attr("class", "line");
+    });
+
+    ipcRenderer.on('new-path-data', function(event, data) {
+        pathData.push(data);
+        pathData.shift();
+        path.attr("d", line);
+    });
+  </script>
+</body>
+</html>
