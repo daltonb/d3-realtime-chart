@@ -40,7 +40,10 @@ app.on('window-all-closed', function() {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
   // Create the browser window.
+
+  // scaling down the window in line with plot scale down
   mainWindow = new BrowserWindow({width: 800, height: 600});
+
   //mainWindow.maximize();
   //mainWindow.setFullScreen(true);
 

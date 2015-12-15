@@ -5,10 +5,14 @@
 <title>Hello World!</title>
 <style>
 
+body {
+    background-color: #F5E8DF;
+}
+
 .line {
   fill: none;
   stroke: #000;
-  stroke-width: 1.5px;
+  stroke-width: 3.5px;
 }
 
 </style>
@@ -25,8 +29,9 @@
     var pathData = new Array(pathDim).fill(0);
 
     var margin = {top: 30, bottom: 30, left: 50, right: 50},
-        height = 500 - margin.top - margin.bottom,
-        width = 1000 - margin.left - margin.right;
+        // scaling down the plot had the biggest discernable effect
+        height = 250 - margin.top - margin.bottom,
+        width = 500 - margin.left - margin.right;
 
     var xDomain = [0, pathDim],
         yDomain = [-500, 500];
@@ -57,10 +62,20 @@
         path.attr("class", "line");
     });
 
+    function handleRepaint () {
+        path.attr("d", line);
+    }
+
+    //setInterval(handleRepaint, 20)
+
     ipcRenderer.on('new-path-data', function(event, data) {
         pathData.push(data);
         pathData.shift();
-        path.attr("d", line);
+
+        // didn't make a difference in terms of render quality, but not a bad
+        // thing to do for performance anyway
+
+        requestAnimationFrame(handleRepaint)
     });
   </script>
 </body>
